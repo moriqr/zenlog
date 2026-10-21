@@ -13,6 +13,7 @@ import json
 import uuid
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from tkinter import messagebox
 from typing import Any
 
 import customtkinter as ctk
@@ -277,6 +278,26 @@ class PunchData:
             cur += timedelta(days=1)
         return total
 
+    def delete_session(self, clock_in: str) -> bool:
+        before = len(self.data["sessions"])
+        self.data["sessions"] = [
+            s for s in self.data["sessions"] if s.get("clock_in") != clock_in
+        ]
+        if len(self.data["sessions"]) == before:
+            return False
+        self.save()
+        return True
+
+    def delete_break(self, break_start: str) -> bool:
+        before = len(self.data["breaks"])
+        self.data["breaks"] = [
+            b for b in self.data["breaks"] if b.get("break_start") != break_start
+        ]
+        if len(self.data["breaks"]) == before:
+            return False
+        self.save()
+        return True
+
     def punches_on_date(self, day: date) -> list[dict[str, Any]]:
         key = day.strftime(DATE_FMT)
         rows: list[dict[str, Any]] = []
@@ -291,6 +312,8 @@ class PunchData:
                     "end": s["clock_out"],
                     "duration_hours": float(s["duration_hours"]),
                     "sort_key": s["clock_out"],
+                    "kind": "session",
+                    "key": s["clock_in"],
                 }
             )
         for b in self.data["breaks"]:
@@ -304,6 +327,8 @@ class PunchData:
                     "end": b["break_end"],
                     "duration_hours": float(b["duration_hours"]),
                     "sort_key": b["break_end"],
+                    "kind": "break",
+                    "key": b["break_start"],
                 }
             )
         session = self.data.get("current_session")
@@ -316,6 +341,8 @@ class PunchData:
                     "end": now().strftime(ISO_FMT),
                     "duration_hours": self.live_session_hours(),
                     "sort_key": now().strftime(ISO_FMT),
+                    "kind": None,
+                    "key": None,
                 }
             )
         rows.sort(key=lambda r: r["sort_key"])
@@ -340,6 +367,8 @@ class PunchData:
                     "end": s["clock_out"],
                     "duration_hours": float(s["duration_hours"]),
                     "sort_key": s["clock_out"],
+                    "kind": "session",
+                    "key": s["clock_in"],
                 }
             )
         for b in self.data["breaks"]:
@@ -351,6 +380,8 @@ class PunchData:
                     "end": b["break_end"],
                     "duration_hours": float(b["duration_hours"]),
                     "sort_key": b["break_end"],
+                    "kind": "break",
+                    "key": b["break_start"],
                 }
             )
         rows.sort(key=lambda r: r["sort_key"], reverse=True)
@@ -956,7 +987,21 @@ class ZenLogApp(ctk.CTk):
                 anchor="w",
                 font=ctk.CTkFont(family="Segoe UI", size=11),
                 text_color=COLORS["text"],
-            ).pack(side="left", fill="x", expand=True, padx=(0, 8), pady=6)
+            ).pack(side="left", fill="x", expand=True, padx=(0, 4), pady=6)
+
+            if row.get("kind") and row.get("key"):
+                ctk.CTkButton(
+                    line,
+                    text="Delete",
+                    width=58,
+                    height=22,
+                    corner_radius=6,
+                    fg_color=COLORS["pink"],
+                    hover_color=COLORS["pink_hover"],
+                    text_color=COLORS["text"],
+                    font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+                    command=lambda r=row: self._on_delete_punch(r),
+                ).pack(side="right", padx=(0, 8), pady=6)
 
     def _render_history(self) -> None:
         for child in self.history_frame.winfo_children():
@@ -1006,6 +1051,20 @@ class ZenLogApp(ctk.CTk):
                     font=ctk.CTkFont(family="Segoe UI", size=12),
                     text_color=COLORS["text"],
                 ).pack(side="left", padx=4, pady=8)
+
+            if row.get("kind") and row.get("key"):
+                ctk.CTkButton(
+                    line,
+                    text="Delete",
+                    width=64,
+                    height=26,
+                    corner_radius=8,
+                    fg_color=COLORS["pink"],
+                    hover_color=COLORS["pink_hover"],
+                    text_color=COLORS["text"],
+                    font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+                    command=lambda r=row: self._on_delete_punch(r),
+                ).pack(side="right", padx=(4, 10), pady=8)
 
     def _render_seeds(self) -> None:
         for child in self.seeds_frame.winfo_children():
@@ -1064,6 +1123,32 @@ class ZenLogApp(ctk.CTk):
     def _on_end_break(self) -> None:
         self.store.end_break()
         self._refresh()
+
+    def _on_delete_punch(self, row: dict[str, Any]) -> None:
+        kind = row.get("kind")
+        key = row.get("key")
+        if not kind or not key:
+            return
+
+        start_t = format_time(parse_iso(row["start"]))
+        end_t = format_time(parse_iso(row["end"]))
+        label = "work session" if kind == "session" else "break"
+        confirmed = messagebox.askyesno(
+            "Delete punch",
+            f"Delete this {label}?\n\n"
+            f"{row['date']}  {start_t}–{end_t}  ·  {format_duration(row['duration_hours'])}",
+            parent=self,
+        )
+        if not confirmed:
+            return
+
+        deleted = (
+            self.store.delete_session(key)
+            if kind == "session"
+            else self.store.delete_break(key)
+        )
+        if deleted:
+            self._refresh()
 
     def _on_add_seed(self) -> None:
         raw = self.seed_hours_entry.get().strip()
