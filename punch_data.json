@@ -1,0 +1,17 @@
+{
+  "past_hours": 80.0,
+  "past_hour_seeds": [
+    {
+      "id": "689c54ea-f3f9-40e6-9295-5d276e4885ee",
+      "date": "2026-10-21",
+      "hours": 80.0,
+      "note": "Migrated from previous past-hours seed",
+      "created_at": "2026-10-21T15:23:52"
+    }
+  ],
+  "status": "clocked_out",
+  "current_session": null,
+  "current_break": null,
+  "sessions": [],
+  "breaks": []
+}
