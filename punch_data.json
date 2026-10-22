@@ -12,6 +12,29 @@
   "status": "clocked_out",
   "current_session": null,
   "current_break": null,
-  "sessions": [],
-  "breaks": []
+  "sessions": [
+    {
+      "date": "2026-10-21",
+      "clock_in": "2026-10-21T15:41:54",
+      "clock_out": "2026-10-21T22:09:44",
+      "duration_hours": 5.7992,
+      "type": "work"
+    }
+  ],
+  "breaks": [
+    {
+      "date": "2026-10-21",
+      "break_start": "2026-10-21T17:23:48",
+      "break_end": "2026-10-21T17:36:42",
+      "duration_hours": 0.215,
+      "type": "break"
+    },
+    {
+      "date": "2026-10-21",
+      "break_start": "2026-10-21T19:20:17",
+      "break_end": "2026-10-21T19:47:16",
+      "duration_hours": 0.4497,
+      "type": "break"
+    }
+  ]
 }
