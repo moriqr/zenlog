@@ -1,5 +1,5 @@
 {
-  "past_hours": 80.0,
+  "past_hours": 81.0,
   "past_hour_seeds": [
     {
       "id": "689c54ea-f3f9-40e6-9295-5d276e4885ee",
@@ -7,10 +7,20 @@
       "hours": 80.0,
       "note": "Migrated from previous past-hours seed",
       "created_at": "2026-10-21T15:23:52"
+    },
+    {
+      "id": "f84a952c-d496-4bc5-8a27-aa91439b4a22",
+      "date": "2026-10-22",
+      "hours": 1.0,
+      "note": "",
+      "created_at": "2026-10-22T16:08:04"
     }
   ],
-  "status": "clocked_out",
-  "current_session": null,
+  "status": "clocked_in",
+  "current_session": {
+    "date": "2026-10-24",
+    "clock_in": "2026-10-24T22:08:31"
+  },
   "current_break": null,
   "sessions": [
     {
@@ -18,6 +28,41 @@
       "clock_in": "2026-10-21T15:41:54",
       "clock_out": "2026-10-21T22:09:44",
       "duration_hours": 5.7992,
+      "type": "work"
+    },
+    {
+      "date": "2026-10-22",
+      "clock_in": "2026-10-22T16:07:29",
+      "clock_out": "2026-10-22T23:28:19",
+      "duration_hours": 6.0786,
+      "type": "work"
+    },
+    {
+      "date": "2026-10-22",
+      "clock_in": "2026-10-22T23:53:34",
+      "clock_out": "2026-10-22T23:56:31",
+      "duration_hours": 0.0492,
+      "type": "work"
+    },
+    {
+      "date": "2026-10-23",
+      "clock_in": "2026-10-23T03:50:00",
+      "clock_out": "2026-10-23T05:00:00",
+      "duration_hours": 1.1667,
+      "type": "work"
+    },
+    {
+      "date": "2026-10-23",
+      "clock_in": "2026-10-23T17:23:44",
+      "clock_out": "2026-10-23T20:07:53",
+      "duration_hours": 0.7614,
+      "type": "work"
+    },
+    {
+      "date": "2026-10-24",
+      "clock_in": "2026-10-24T17:03:15",
+      "clock_out": "2026-10-24T20:08:01",
+      "duration_hours": 0.755,
       "type": "work"
     }
   ],
@@ -34,6 +79,41 @@
       "break_start": "2026-10-21T19:20:17",
       "break_end": "2026-10-21T19:47:16",
       "duration_hours": 0.4497,
+      "type": "break"
+    },
+    {
+      "date": "2026-10-22",
+      "break_start": "2026-10-22T16:44:09",
+      "break_end": "2026-10-22T16:51:39",
+      "duration_hours": 0.125,
+      "type": "break"
+    },
+    {
+      "date": "2026-10-22",
+      "break_start": "2026-10-22T19:12:09",
+      "break_end": "2026-10-22T19:37:09",
+      "duration_hours": 0.4167,
+      "type": "break"
+    },
+    {
+      "date": "2026-10-22",
+      "break_start": "2026-10-22T21:28:11",
+      "break_end": "2026-10-22T22:11:48",
+      "duration_hours": 0.7269,
+      "type": "break"
+    },
+    {
+      "date": "2026-10-23",
+      "break_start": "2026-10-23T18:09:23",
+      "break_end": "2026-10-23T20:07:51",
+      "duration_hours": 1.9744,
+      "type": "break"
+    },
+    {
+      "date": "2026-10-24",
+      "break_start": "2026-10-24T17:48:32",
+      "break_end": "2026-10-24T20:08:00",
+      "duration_hours": 2.3244,
       "type": "break"
     }
   ]

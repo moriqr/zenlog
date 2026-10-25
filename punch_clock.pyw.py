@@ -2,10 +2,11 @@
 ZenLog launcher (double-click / legacy entry point).
 
 The app lives in the `zenlog` package:
-  - zenlog/app.py              shell + page navigation
-  - zenlog/pages/punch_page.py punch clock UI
+  - zenlog/app.py                 shell + page navigation
+  - zenlog/pages/punch_page.py    punch clock UI
+  - zenlog/pages/history_page.py  view / delete sessions
   - zenlog/pages/calendar_page.py calendar UI
-  - zenlog/data.py             persistence / business logic
+  - zenlog/data.py                persistence / business logic
 
 Run with:  python punch_clock.pyw.py
        or:  python -m zenlog

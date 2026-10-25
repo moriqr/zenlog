@@ -216,6 +216,14 @@ class PunchData:
             cur += timedelta(days=1)
         return total
 
+    def _recalc_session_durations(self) -> None:
+        for session in self.data["sessions"]:
+            clock_in = parse_iso(session["clock_in"])
+            clock_out = parse_iso(session["clock_out"])
+            duration_hours = (clock_out - clock_in).total_seconds() / 3600.0
+            duration_hours -= self._break_hours_between(clock_in, clock_out)
+            session["duration_hours"] = round(max(0.0, duration_hours), 4)
+
     def delete_session(self, clock_in: str) -> bool:
         before = len(self.data["sessions"])
         self.data["sessions"] = [
@@ -233,8 +241,41 @@ class PunchData:
         ]
         if len(self.data["breaks"]) == before:
             return False
+        self._recalc_session_durations()
         self.save()
         return True
+
+    def update_session(self, old_clock_in: str, clock_in: datetime, clock_out: datetime) -> bool:
+        if clock_out <= clock_in:
+            raise ValueError("Clock out must be after clock in.")
+        for session in self.data["sessions"]:
+            if session.get("clock_in") != old_clock_in:
+                continue
+            duration_hours = (clock_out - clock_in).total_seconds() / 3600.0
+            duration_hours -= self._break_hours_between(clock_in, clock_out)
+            session["date"] = clock_in.strftime(DATE_FMT)
+            session["clock_in"] = clock_in.strftime(ISO_FMT)
+            session["clock_out"] = clock_out.strftime(ISO_FMT)
+            session["duration_hours"] = round(max(0.0, duration_hours), 4)
+            self.save()
+            return True
+        return False
+
+    def update_break(self, old_break_start: str, break_start: datetime, break_end: datetime) -> bool:
+        if break_end <= break_start:
+            raise ValueError("Break end must be after break start.")
+        for br in self.data["breaks"]:
+            if br.get("break_start") != old_break_start:
+                continue
+            duration_hours = (break_end - break_start).total_seconds() / 3600.0
+            br["date"] = break_start.strftime(DATE_FMT)
+            br["break_start"] = break_start.strftime(ISO_FMT)
+            br["break_end"] = break_end.strftime(ISO_FMT)
+            br["duration_hours"] = round(max(0.0, duration_hours), 4)
+            self._recalc_session_durations()
+            self.save()
+            return True
+        return False
 
     def punches_on_date(self, day: date) -> list[dict[str, Any]]:
         key = day.strftime(DATE_FMT)
