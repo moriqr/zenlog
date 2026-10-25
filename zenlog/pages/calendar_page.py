@@ -34,8 +34,8 @@ class CalendarPage(ctk.CTkFrame):
     def _build(self) -> None:
         page_title(
             self,
-            "Calendar",
-            "Browse punch sessions by day, week, or month. Past-hour seeds stay off this view.",
+            "calendar",
+            "browse punch sessions by day, week, or month. past-hour seeds stay off this view.",
         )
 
         _, card = cute_window(self, title="month view")
@@ -51,8 +51,6 @@ class CalendarPage(ctk.CTkFrame):
             "‹",
             width=40,
             height=32,
-            fg=COLORS["lavender"],
-            hover=COLORS["lavender_hover"],
             command=self._prev_month,
         ).grid(row=0, column=0, padx=(0, 6))
 
@@ -69,8 +67,6 @@ class CalendarPage(ctk.CTkFrame):
             "›",
             width=40,
             height=32,
-            fg=COLORS["lavender"],
-            hover=COLORS["lavender_hover"],
             command=self._next_month,
         ).grid(row=0, column=2, padx=(6, 0))
 
@@ -80,28 +76,25 @@ class CalendarPage(ctk.CTkFrame):
 
         pill_button(
             summary_row,
-            "This Week",
+            "this week",
             height=34,
-            fg=COLORS["cream"],
-            hover=COLORS["blush"],
+            bow=True,
             command=self._show_week_summary,
         ).grid(row=0, column=0, sticky="ew", padx=3)
 
         pill_button(
             summary_row,
-            "Month So Far",
+            "month so far",
             height=34,
-            fg=COLORS["blush"],
-            hover=COLORS["pink"],
+            bow=True,
             command=self._show_month_summary,
         ).grid(row=0, column=1, sticky="ew", padx=3)
 
         pill_button(
             summary_row,
-            "Selected Day",
+            "selected day",
             height=34,
-            fg=COLORS["lavender"],
-            hover=COLORS["lavender_hover"],
+            bow=True,
             command=self._show_day_summary,
         ).grid(row=0, column=2, sticky="ew", padx=3)
 
@@ -116,12 +109,12 @@ class CalendarPage(ctk.CTkFrame):
         self.calendar_grid = ctk.CTkFrame(cal_wrap, fg_color="transparent")
         self.calendar_grid.pack(fill="both", expand=True, padx=10, pady=10)
 
-        detail_wrap = cute_panel(body, fg=COLORS["cream"])
+        detail_wrap = cute_panel(body, fg=COLORS["card"])
         detail_wrap.grid(row=0, column=1, sticky="nsew")
 
         self.detail_title = ctk.CTkLabel(
             detail_wrap,
-            text="Day detail",
+            text="day detail",
             font=ctk.CTkFont(family=FONT_DISPLAY, size=14, weight="bold"),
             text_color=COLORS["text"],
         )
@@ -216,7 +209,8 @@ class CalendarPage(ctk.CTkFrame):
                 elif is_today and in_month:
                     bg = COLORS["today"]
                 else:
-                    bg = COLORS["card"] if in_month else COLORS["disabled"]
+                    # Pink day chips on cream paper; cream = today; purple = selected
+                    bg = COLORS["blush"] if in_month else COLORS["disabled"]
 
                 hours_text = format_duration(hours) if in_month and hours > 0 else "—"
                 day_color = COLORS["text"] if in_month else COLORS["disabled_text"]
@@ -246,7 +240,7 @@ class CalendarPage(ctk.CTkFrame):
             end_cap = min(end, today)
             rows = self.store.punches_in_range(start, end_cap)
             total = self.store.hours_in_range(start, end_cap)
-            self.detail_title.configure(text="Week summary")
+            self.detail_title.configure(text="week summary")
             self.detail_sub.configure(
                 text=f"{start.strftime('%b %d')} – {end_cap.strftime('%b %d')}: "
                 f"{format_duration(total)} ({total:.2f}h)"
@@ -258,7 +252,7 @@ class CalendarPage(ctk.CTkFrame):
             end_cap = min(end, today)
             rows = self.store.punches_in_range(start, end_cap)
             total = self.store.hours_in_range(start, end_cap)
-            self.detail_title.configure(text="Month so far")
+            self.detail_title.configure(text="month so far")
             self.detail_sub.configure(
                 text=f"{start.strftime('%B %Y')} through {end_cap.strftime('%b %d')}: "
                 f"{format_duration(total)} ({total:.2f}h)"
@@ -267,7 +261,7 @@ class CalendarPage(ctk.CTkFrame):
             day = self.selected_day or today
             rows = self.store.punches_on_date(day)
             total = self.store.hours_on_date(day)
-            self.detail_title.configure(text="Day detail")
+            self.detail_title.configure(text="day detail")
             self.detail_sub.configure(
                 text=f"{day.strftime('%A, %b %d')}: {format_duration(total)} ({total:.2f}h)"
             )
@@ -286,7 +280,7 @@ class CalendarPage(ctk.CTkFrame):
             line = cute_panel(self.detail_list, fg=bg, radius=10)
             line.pack(fill="x", pady=2)
 
-            badge_color = COLORS["lavender"] if "Work" in row["type"] else COLORS["blush"]
+            badge_color = COLORS["blush"] if "Work" in row["type"] else COLORS["cream"]
             ctk.CTkLabel(
                 line,
                 text=row["type"],
@@ -311,12 +305,10 @@ class CalendarPage(ctk.CTkFrame):
             if row.get("kind") and row.get("key"):
                 pill_button(
                     line,
-                    "Delete",
+                    "delete",
                     width=58,
                     height=22,
                     font_size=10,
-                    fg=COLORS["pink"],
-                    hover=COLORS["pink_hover"],
                     command=lambda r=row: self._on_delete_punch(r),
                 ).pack(side="right", padx=(0, 8), pady=6)
 

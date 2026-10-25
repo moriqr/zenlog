@@ -29,18 +29,18 @@ class ForgottenHoursPage(ctk.CTkFrame):
     def _build(self) -> None:
         page_title(
             self,
-            "Forgotten hours",
-            "Log hours you forgot to punch. These count toward the all-time total only — never the calendar.",
+            "forgotten hours",
+            "log hours you forgot to punch. these count toward the all-time total only — never the calendar.",
         )
 
         _, wrap = cute_window(self, title="forgotten seeds")
 
-        form = cute_panel(wrap, fg=COLORS["cream"])
+        form = cute_panel(wrap, fg=COLORS["card"], chunky=True)
         form.pack(fill="x", padx=10, pady=(10, 8))
 
         ctk.CTkLabel(
             form,
-            text="Add forgotten hours",
+            text="add forgotten hours",
             font=ctk.CTkFont(family=FONT_DISPLAY, size=13, weight="bold"),
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=14, pady=(12, 6))
@@ -89,11 +89,10 @@ class ForgottenHoursPage(ctk.CTkFrame):
 
         pill_button(
             row,
-            "Add",
+            "add",
             width=80,
             height=34,
-            fg=COLORS["lavender"],
-            hover=COLORS["lavender_hover"],
+            bow=True,
             command=self._on_add_seed,
         ).pack(side="right")
 
@@ -149,7 +148,7 @@ class ForgottenHoursPage(ctk.CTkFrame):
                 width=70,
                 height=26,
                 corner_radius=10,
-                fg_color=COLORS["pink"],
+                fg_color=COLORS["blush"],
                 text_color=COLORS["text"],
                 font=ctk.CTkFont(family=FONT_DISPLAY, size=11, weight="bold"),
             ).pack(side="left", padx=(10, 4), pady=8)

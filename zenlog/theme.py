@@ -7,42 +7,45 @@ import sys
 from ctypes import wintypes
 from pathlib import Path
 
-# Your palette, mapped like the soft-pink window reference:
-#   #F7C7D9  wallpaper / outer blush
-#   #FFF8E7  cream paper windows (boxes)
-#   #E88BAE  cute borders + title bars
-#   #AA84C6  soft purple accents (active / primary)
-#   #F9E29B  tiny warm highlight only (not big surfaces)
-#   #5E3D52  muted plum
+# Uniform soft palette:
+#   #F7C7D9  wallpaper / soft fills / hovers
+#   #FFF8E7  cream paper (boxes + buttons)
+#   #AA84C6  OUTER borders only (not button fills)
+#   #E88BAE  barely used (tiny accents only)
+#   #F9E29B  tiny warm "today" highlight
+#   #5E3D52  muted text
 #   #3D303E  ink
 COLORS = {
     "bg": "#F7C7D9",
     "card": "#FFF8E7",
     "blush": "#F7C7D9",
-    "lavender": "#AA84C6",
-    "lavender_hover": "#9570B5",
-    "pink": "#E88BAE",
-    "pink_hover": "#D9789E",
+    # Kept for legacy keys — all map to soft cream / blush (no purple fills)
+    "lavender": "#FFF8E7",
+    "lavender_hover": "#F7C7D9",
+    "pink": "#FFF8E7",
+    "pink_hover": "#F7C7D9",
     "mint": "#FFF8E7",
     "mint_hover": "#F7C7D9",
     "cream": "#FFF8E7",
-    "peach": "#F7C7D9",
-    "peach_hover": "#E88BAE",
+    "peach": "#FFF8E7",
+    "peach_hover": "#F7C7D9",
     "text": "#3D303E",
     "text_muted": "#5E3D52",
-    "border": "#E88BAE",
+    "border": "#AA84C6",  # purple outlines for buttons + boxes
+    "border_soft": "#AA84C6",  # same purple (kept for older call sites)
     "disabled": "#F7C7D9",
-    "disabled_text": "#AA84C6",
+    "disabled_text": "#5E3D52",
     "today": "#FEF1C4",
-    "selected": "#E8D4F5",
+    "selected": "#F7C7D9",
     "titlebar": "#F7C7D9",
+    "accent": "#E88BAE",  # rare accent (e.g. one traffic light)
 }
 
-# Clean cute outlines (like the reference windows)
-BORDER_WIDTH = 2
-BORDER_WIDTH_CHUNKY = 3
+BORDER_WIDTH = 3
+BORDER_WIDTH_CHUNKY = 4
 CORNER_RADIUS = 16
 CORNER_RADIUS_PILL = 22
+CORNER_RADIUS_SOFT = CORNER_RADIUS_PILL
 
 _FONTS_DIR = Path(__file__).resolve().parent / "fonts"
 _fonts_loaded = False
@@ -72,6 +75,19 @@ def _load_bundled_fonts() -> None:
 
 _load_bundled_fonts()
 
-FONT_DISPLAY = "Fredoka"
+# Bundled Fredoka TTFs register as "Fredoka Light" / "Fredoka Light SemiBold" on Windows.
+FONT_DISPLAY = "Fredoka Light"
+FONT_DISPLAY_BOLD = "Fredoka Light SemiBold"
 FONT_BODY = "Comfortaa"
 FONT_FAMILY = FONT_DISPLAY
+
+ASSETS_DIR = Path(__file__).resolve().parent / "assets"
+PAGE_BORDER_PATH = ASSETS_DIR / "page-border.png"
+PUNCH_BORDER_PATH = ASSETS_DIR / "1x1.png"
+# Frame hole is ~12% x / ~9% y of the PNG — keep UI inside it
+PAGE_BORDER_FRAC_X = 0.13
+PAGE_BORDER_FRAC_Y = 0.11
+PAGE_BORDER_INSET_X = 120
+PAGE_BORDER_INSET_Y = 100
+# Square 1x1 lace: hole starts ~56/500 from each edge
+PUNCH_BORDER_INSET_FRAC = 0.12

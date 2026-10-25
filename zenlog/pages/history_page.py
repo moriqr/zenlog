@@ -30,8 +30,8 @@ class HistoryPage(ctk.CTkFrame):
     def _build(self) -> None:
         page_title(
             self,
-            "History",
-            "All punched work and break sessions. Edit a row to fix wrong times, or delete a mistake.",
+            "history",
+            "all punched work and break sessions. edit a row to fix wrong times, or delete a mistake.",
         )
 
         totals = cute_panel(self, chunky=True)
@@ -86,7 +86,7 @@ class HistoryPage(ctk.CTkFrame):
             line = cute_panel(self.history_frame, fg=bg, radius=12)
             line.pack(fill="x", padx=4, pady=3)
 
-            type_color = COLORS["lavender"] if row["type"] == "Work" else COLORS["blush"]
+            type_color = COLORS["blush"] if row["type"] == "Work" else COLORS["cream"]
             ctk.CTkLabel(
                 line,
                 text=row["type"],
@@ -122,23 +122,19 @@ class HistoryPage(ctk.CTkFrame):
 
                 pill_button(
                     actions,
-                    "Edit",
+                    "edit",
                     width=64,
                     height=26,
                     font_size=11,
-                    fg=COLORS["lavender"],
-                    hover=COLORS["lavender_hover"],
                     command=lambda r=row: self._on_edit_punch(r),
                 ).pack(side="left", padx=(0, 6))
 
                 pill_button(
                     actions,
-                    "Delete",
+                    "delete",
                     width=64,
                     height=26,
                     font_size=11,
-                    fg=COLORS["pink"],
-                    hover=COLORS["pink_hover"],
                     command=lambda r=row: self._on_delete_punch(r),
                 ).pack(side="left")
 
@@ -213,7 +209,7 @@ class HistoryPage(ctk.CTkFrame):
             body,
             text="",
             font=ctk.CTkFont(family=FONT_BODY, size=11),
-            text_color=COLORS["pink_hover"],
+            text_color=COLORS["text_muted"],
         )
         hint.pack(anchor="w", pady=(8, 0))
 
@@ -264,7 +260,7 @@ class HistoryPage(ctk.CTkFrame):
 
         pill_button(
             actions,
-            "Cancel",
+            "cancel",
             width=100,
             height=34,
             command=dialog.destroy,
@@ -272,11 +268,9 @@ class HistoryPage(ctk.CTkFrame):
 
         pill_button(
             actions,
-            "Save",
+            "save",
             width=100,
             height=34,
-            fg=COLORS["lavender"],
-            hover=COLORS["lavender_hover"],
             command=_save,
         ).pack(side="right")
 
