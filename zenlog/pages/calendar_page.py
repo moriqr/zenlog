@@ -275,12 +275,13 @@ class CalendarPage(ctk.CTkFrame):
             ).pack(anchor="w", padx=6, pady=10)
             return
 
-        for i, row in enumerate(rows):
-            bg = COLORS["cream"] if i % 2 == 0 else COLORS["blush"]
+        for row in rows:
+            is_work = "Work" in row["type"]
+            bg = COLORS["blush"] if is_work else COLORS["cream"]
             line = cute_panel(self.detail_list, fg=bg, radius=10)
             line.pack(fill="x", pady=2)
 
-            badge_color = COLORS["blush"] if "Work" in row["type"] else COLORS["cream"]
+            badge_color = COLORS["cream"] if is_work else COLORS["blush"]
             ctk.CTkLabel(
                 line,
                 text=row["type"],

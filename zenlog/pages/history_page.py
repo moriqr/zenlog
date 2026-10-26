@@ -81,12 +81,13 @@ class HistoryPage(ctk.CTkFrame):
             ).pack(padx=12, pady=16, anchor="w")
             return
 
-        for i, row in enumerate(rows):
-            bg = COLORS["cream"] if i % 2 == 0 else COLORS["blush"]
+        for row in rows:
+            is_work = row["type"] == "Work"
+            bg = COLORS["blush"] if is_work else COLORS["cream"]
             line = cute_panel(self.history_frame, fg=bg, radius=12)
             line.pack(fill="x", padx=4, pady=3)
 
-            type_color = COLORS["blush"] if row["type"] == "Work" else COLORS["cream"]
+            type_color = COLORS["cream"] if is_work else COLORS["blush"]
             ctk.CTkLabel(
                 line,
                 text=row["type"],
