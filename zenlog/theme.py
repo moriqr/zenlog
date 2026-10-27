@@ -8,7 +8,8 @@ from ctypes import wintypes
 from pathlib import Path
 
 # Uniform soft palette:
-#   #F7C7D9  wallpaper / soft fills / hovers
+#   #FFFFFF  wallpaper / window
+#   #F7C7D9  soft fills / hovers
 #   #FFF8E7  cream paper (boxes + buttons)
 #   #AA84C6  OUTER borders only (not button fills)
 #   #E88BAE  barely used (tiny accents only)
@@ -16,7 +17,7 @@ from pathlib import Path
 #   #5E3D52  muted text
 #   #3D303E  ink
 COLORS = {
-    "bg": "#F7C7D9",
+    "bg": "#FFFFFF",
     "card": "#FFF8E7",
     "blush": "#F7C7D9",
     # Kept for legacy keys — all map to soft cream / blush (no purple fills)
@@ -37,7 +38,7 @@ COLORS = {
     "disabled_text": "#5E3D52",
     "today": "#FEF1C4",
     "selected": "#F7C7D9",
-    "titlebar": "#F7C7D9",
+    "titlebar": "#FFFFFF",
     "accent": "#E88BAE",  # rare accent (e.g. one traffic light)
 }
 
