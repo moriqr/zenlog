@@ -78,7 +78,6 @@ class CalendarPage(ctk.CTkFrame):
             summary_row,
             "this week",
             height=34,
-            bow=True,
             command=self._show_week_summary,
         ).grid(row=0, column=0, sticky="ew", padx=3)
 
@@ -86,7 +85,6 @@ class CalendarPage(ctk.CTkFrame):
             summary_row,
             "month so far",
             height=34,
-            bow=True,
             command=self._show_month_summary,
         ).grid(row=0, column=1, sticky="ew", padx=3)
 
@@ -94,7 +92,6 @@ class CalendarPage(ctk.CTkFrame):
             summary_row,
             "selected day",
             height=34,
-            bow=True,
             command=self._show_day_summary,
         ).grid(row=0, column=2, sticky="ew", padx=3)
 

@@ -37,7 +37,7 @@ class ZenLogApp(ctk.CTk):
 
         self.title("zenlog")
         self.geometry("920x900")
-        self.minsize(820, 780)
+        self.minsize(720, 720)
         self.configure(fg_color=COLORS["bg"])
         if ICON_PATH.exists():
             try:
@@ -93,8 +93,9 @@ class ZenLogApp(ctk.CTk):
         header = ctk.CTkFrame(outer, fg_color="transparent")
         header.pack(fill="x", pady=(0, 8))
 
+        # Brand + nav stacked so all four tabs stay visible in smaller windows
         brand = ctk.CTkFrame(header, fg_color="transparent")
-        brand.pack(side="left", fill="x", expand=True)
+        brand.pack(fill="x")
 
         ctk.CTkLabel(
             brand,
@@ -110,7 +111,7 @@ class ZenLogApp(ctk.CTk):
         ).pack(anchor="w", pady=(2, 0))
 
         nav = ctk.CTkFrame(header, fg_color="transparent")
-        nav.pack(side="right", padx=(12, 0))
+        nav.pack(fill="x", pady=(10, 0))
 
         for key, label in (
             ("punch", "punch"),
@@ -121,14 +122,13 @@ class ZenLogApp(ctk.CTk):
             btn = pill_button(
                 nav,
                 label,
-                width=108,
-                height=36,
-                bow=True,
+                width=100,
+                height=34,
                 fg=COLORS["cream"],
                 hover=COLORS["blush"],
                 command=lambda k=key: self._show_page(k),
             )
-            btn.pack(side="left", padx=(0, 6))
+            btn.pack(side="left", padx=(0, 8))
             self._nav_btns[key] = btn
 
         self.content = ctk.CTkFrame(outer, fg_color="transparent")

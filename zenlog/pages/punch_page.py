@@ -11,10 +11,10 @@ from zenlog.theme import COLORS, FONT_BODY, FONT_DISPLAY
 from zenlog.timeutil import format_duration, format_time, parse_iso
 from zenlog.widgets import lace_frame, page_title, pill_button
 
-BTN_WIDTH = 340
-BTN_HEIGHT = 72
-BTN_FONT_SIZE = 22
-STATION_SIZE = 540
+BTN_WIDTH = 300
+BTN_HEIGHT = 56
+BTN_FONT_SIZE = 18
+STATION_SIZE = 480
 
 
 class PunchPage(ctk.CTkFrame):
@@ -48,12 +48,12 @@ class PunchPage(ctk.CTkFrame):
         outer.pack(expand=True, padx=8, pady=8)
 
         status_block = ctk.CTkFrame(pad, fg_color="transparent")
-        status_block.pack(fill="x", padx=12, pady=(8, 4))
+        status_block.pack(fill="x", padx=10, pady=(4, 2))
 
         self.status_label = ctk.CTkLabel(
             status_block,
             text="clocked out",
-            font=ctk.CTkFont(family=FONT_DISPLAY, size=26, weight="bold"),
+            font=ctk.CTkFont(family=FONT_DISPLAY, size=22, weight="bold"),
             text_color=COLORS["text"],
         )
         self.status_label.pack()
@@ -61,24 +61,24 @@ class PunchPage(ctk.CTkFrame):
         self.status_detail = ctk.CTkLabel(
             status_block,
             text="ready when you are ♡",
-            font=ctk.CTkFont(family=FONT_BODY, size=14),
+            font=ctk.CTkFont(family=FONT_BODY, size=13),
             text_color=COLORS["text_muted"],
         )
-        self.status_detail.pack(pady=(4, 0))
+        self.status_detail.pack(pady=(2, 0))
 
         btns = ctk.CTkFrame(pad, fg_color="transparent")
-        btns.pack(expand=True, padx=12, pady=(8, 12))
+        btns.pack(expand=True, padx=10, pady=(4, 8))
 
         self.clock_in_btn = self._make_punch_btn(btns, "clock in", self._on_clock_in)
-        self.clock_in_btn.pack(pady=(0, 10))
+        self.clock_in_btn.pack(pady=(0, 8))
 
         self.clock_out_btn = self._make_punch_btn(btns, "clock out", self._on_clock_out)
-        self.clock_out_btn.pack(pady=(0, 10))
+        self.clock_out_btn.pack(pady=(0, 8))
 
         self.start_break_btn = self._make_punch_btn(
             btns, "start break", self._on_start_break
         )
-        self.start_break_btn.pack(pady=(0, 10))
+        self.start_break_btn.pack(pady=(0, 8))
 
         self.end_break_btn = self._make_punch_btn(btns, "end break", self._on_end_break)
         self.end_break_btn.pack()
@@ -97,7 +97,7 @@ class PunchPage(ctk.CTkFrame):
             font_size=BTN_FONT_SIZE,
             fg=COLORS["cream"],
             hover=COLORS["blush"],
-            bow=True,
+            border_color=COLORS["accent"],
             command=command,
         )
 

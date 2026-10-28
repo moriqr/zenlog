@@ -92,7 +92,6 @@ class ForgottenHoursPage(ctk.CTkFrame):
             "add",
             width=80,
             height=34,
-            bow=True,
             command=self._on_add_seed,
         ).pack(side="right")
 

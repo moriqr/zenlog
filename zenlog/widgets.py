@@ -298,15 +298,14 @@ def pill_button(
     height: int = 36,
     fg: str | None = None,
     hover: str | None = None,
+    border_color: str | None = None,
     font_size: int = 13,
     bold: bool = True,
-    bow: bool = False,
 ) -> ctk.CTkButton:
-    """Soft cream pill — blush outline (purple reserved for the page lace)."""
-    label = f"🎀  {text}" if bow else text
+    """Cream pill with a chunky outline — soft coquette border, plain label."""
     return ctk.CTkButton(
         master,
-        text=label,
+        text=text,
         width=width,
         height=height,
         corner_radius=CORNER_RADIUS_PILL,
@@ -319,7 +318,7 @@ def pill_button(
         hover_color=hover if hover is not None else COLORS["blush"],
         text_color=COLORS["text"],
         border_width=BORDER_WIDTH_CHUNKY,
-        border_color=COLORS["border"],
+        border_color=border_color if border_color is not None else COLORS["border"],
         command=command,
     )
 
