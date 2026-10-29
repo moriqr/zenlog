@@ -9,15 +9,12 @@ import customtkinter as ctk
 from zenlog.data import PunchData
 from zenlog.pages import CalendarPage, ForgottenHoursPage, HistoryPage, PunchPage
 from zenlog.theme import (
+    BTN_DECO,
     COLORS,
     FONT_BODY,
     FONT_DISPLAY_BOLD,
-    PAGE_BORDER_FRAC_X,
-    PAGE_BORDER_FRAC_Y,
-    PAGE_BORDER_INSET_X,
-    PAGE_BORDER_INSET_Y,
 )
-from zenlog.widgets import attach_page_border, attach_polka_dots, pill_button
+from zenlog.widgets import attach_background, pill_button
 
 ICON_PATH = Path(__file__).resolve().parent.parent / "zenlog.ico.ico"
 
@@ -29,15 +26,15 @@ class ZenLogApp(ctk.CTk):
         self._current_page = "punch"
         self._pages: dict[str, ctk.CTkFrame] = {}
         self._nav_btns: dict[str, ctk.CTkButton] = {}
-        self._border = None
+        self._wallpaper = None
         self._ui: ctk.CTkFrame | None = None
 
         ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("blue")
 
         self.title("zenlog")
-        self.geometry("920x900")
-        self.minsize(720, 720)
+        self.geometry("960x980")
+        self.minsize(780, 860)
         self.configure(fg_color=COLORS["bg"])
         if ICON_PATH.exists():
             try:
@@ -45,8 +42,7 @@ class ZenLogApp(ctk.CTk):
             except Exception:
                 pass
 
-        attach_polka_dots(self)
-        self._border = attach_page_border(self)
+        self._wallpaper = attach_background(self)
 
         self._build_ui()
         self._stack_layers()
@@ -56,23 +52,19 @@ class ZenLogApp(ctk.CTk):
         self.bind("<Configure>", self._on_resize, add="+")
 
     def _stack_layers(self) -> None:
-        """Wallpaper under lace under UI — keep content clickable."""
+        """Dotted paper above window fill, under UI — dots show around the punch card."""
         try:
-            if self._border is not None:
-                self._border.lower()
+            if self._wallpaper is not None:
+                try:
+                    self._wallpaper.lift(self._canvas)  # type: ignore[attr-defined]
+                except Exception:
+                    self._wallpaper.lift()
             if self._ui is not None:
                 self._ui.lift()
         except Exception:
             pass
 
     def _on_resize(self, _event: object | None = None) -> None:
-        if self._ui is None:
-            return
-        w = max(self.winfo_width(), 1)
-        h = max(self.winfo_height(), 1)
-        pad_x = max(PAGE_BORDER_INSET_X, int(w * PAGE_BORDER_FRAC_X))
-        pad_y = max(PAGE_BORDER_INSET_Y, int(h * PAGE_BORDER_FRAC_Y))
-        self._ui.pack_configure(padx=pad_x, pady=pad_y)
         self._stack_layers()
 
     def _tick(self) -> None:
@@ -82,18 +74,12 @@ class ZenLogApp(ctk.CTk):
 
     def _build_ui(self) -> None:
         outer = ctk.CTkFrame(self, fg_color="transparent")
-        outer.pack(
-            fill="both",
-            expand=True,
-            padx=PAGE_BORDER_INSET_X,
-            pady=PAGE_BORDER_INSET_Y,
-        )
+        outer.pack(fill="both", expand=True, padx=28, pady=24)
         self._ui = outer
 
         header = ctk.CTkFrame(outer, fg_color="transparent")
         header.pack(fill="x", pady=(0, 8))
 
-        # Brand + nav stacked so all four tabs stay visible in smaller windows
         brand = ctk.CTkFrame(header, fg_color="transparent")
         brand.pack(fill="x")
 
@@ -113,23 +99,27 @@ class ZenLogApp(ctk.CTk):
         nav = ctk.CTkFrame(header, fg_color="transparent")
         nav.pack(fill="x", pady=(10, 0))
 
-        for key, label in (
-            ("punch", "punch"),
-            ("forgotten", "forgotten"),
-            ("history", "history"),
-            ("calendar", "calendar"),
-        ):
+        nav_faces = (
+            ("punch", "punch", COLORS["pink"], COLORS["pink_hover"]),
+            ("forgotten", "forgotten", COLORS["cream"], COLORS["butter_hover"]),
+            ("history", "history", COLORS["blush"], COLORS["peach_hover"]),
+            ("calendar", "calendar", COLORS["lavender"], COLORS["lavender_hover"]),
+        )
+        for key, label, fg, hover in nav_faces:
+            deco = BTN_DECO.get(key, "")
             btn = pill_button(
                 nav,
-                label,
-                width=100,
-                height=34,
-                fg=COLORS["cream"],
-                hover=COLORS["blush"],
+                f"{deco} {label}" if deco else label,
+                width=128,
+                height=36,
+                fg=fg,
+                hover=hover,
                 command=lambda k=key: self._show_page(k),
             )
             btn.pack(side="left", padx=(0, 8))
             self._nav_btns[key] = btn
+            btn._zen_fg = fg  # type: ignore[attr-defined]
+            btn._zen_hover = hover  # type: ignore[attr-defined]
 
         self.content = ctk.CTkFrame(outer, fg_color="transparent")
         self.content.pack(fill="both", expand=True)
@@ -159,15 +149,19 @@ class ZenLogApp(ctk.CTk):
 
     def _style_nav(self, active: str) -> None:
         for key, btn in self._nav_btns.items():
+            face = getattr(btn, "_zen_fg", COLORS["cream"])
+            hover = getattr(btn, "_zen_hover", COLORS["blush"])
             if key == active:
                 btn.configure(
-                    fg_color=COLORS["blush"],
-                    hover_color=COLORS["blush"],
+                    fg_color=hover,
+                    hover_color=hover,
+                    border_color=COLORS["accent"],
                 )
             else:
                 btn.configure(
-                    fg_color=COLORS["cream"],
-                    hover_color=COLORS["blush"],
+                    fg_color=face,
+                    hover_color=hover,
+                    border_color=COLORS["border"],
                 )
 
     def _refresh(self) -> None:
