@@ -425,6 +425,73 @@ def pill_button(
     )
 
 
+def rect_button(
+    master: Any,
+    text: str,
+    *,
+    command: Callable[[], None] | None = None,
+    width: int = 100,
+    height: int = 36,
+    fg: str | None = None,
+    hover: str | None = None,
+    border_color: str | None = None,
+    font_size: int = 13,
+    bold: bool = True,
+    shadow: int = 4,
+) -> ctk.CTkFrame:
+    """
+    Sharp rectangle nav button with a hard offset overshadow.
+
+    Returns a host frame (pack this). The real CTkButton is host._zen_button.
+    """
+    face_fg = fg if fg is not None else COLORS["cream"]
+    face_hover = hover if hover is not None else COLORS["blush"]
+    rim_color = border_color if border_color is not None else COLORS["border"]
+    shadow_color = COLORS["border"]
+
+    host = ctk.CTkFrame(
+        master,
+        fg_color="transparent",
+        width=width + shadow,
+        height=height + shadow,
+    )
+    host.pack_propagate(False)
+
+    shade = ctk.CTkFrame(
+        host,
+        fg_color=shadow_color,
+        corner_radius=0,
+        width=width,
+        height=height,
+    )
+    shade.place(x=shadow, y=shadow)
+
+    btn = ctk.CTkButton(
+        host,
+        text=text,
+        width=width,
+        height=height,
+        corner_radius=0,
+        font=ctk.CTkFont(
+            family=FONT_DISPLAY_BOLD if bold else FONT_DISPLAY,
+            size=font_size,
+            weight="bold" if bold else "normal",
+        ),
+        fg_color=face_fg,
+        hover_color=face_hover,
+        text_color=COLORS["text"],
+        text_color_disabled=COLORS["disabled_text"],
+        border_width=BORDER_WIDTH_CHUNKY,
+        border_color=rim_color,
+        command=command,
+    )
+    btn.place(x=0, y=0)
+
+    host._zen_button = btn  # type: ignore[attr-defined]
+    host._zen_shadow = shade  # type: ignore[attr-defined]
+    return host
+
+
 def nintendo_button(
     master: Any,
     text: str,

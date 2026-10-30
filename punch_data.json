@@ -185,6 +185,13 @@
       "break_end": "2026-10-29T05:07:37",
       "duration_hours": 0.4936,
       "type": "break"
+    },
+    {
+      "date": "2026-10-29",
+      "break_start": "2026-10-29T22:24:32",
+      "break_end": "2026-10-30T00:35:30",
+      "duration_hours": 2.1828,
+      "type": "break"
     }
   ]
 }

@@ -14,7 +14,7 @@ from zenlog.theme import (
     FONT_BODY,
     FONT_DISPLAY_BOLD,
 )
-from zenlog.widgets import attach_background, pill_button
+from zenlog.widgets import attach_background, rect_button
 
 ICON_PATH = Path(__file__).resolve().parent.parent / "zenlog.ico.ico"
 
@@ -107,7 +107,7 @@ class ZenLogApp(ctk.CTk):
         )
         for key, label, fg, hover in nav_faces:
             deco = BTN_DECO.get(key, "")
-            btn = pill_button(
+            host = rect_button(
                 nav,
                 f"{deco} {label}" if deco else label,
                 width=128,
@@ -116,7 +116,8 @@ class ZenLogApp(ctk.CTk):
                 hover=hover,
                 command=lambda k=key: self._show_page(k),
             )
-            btn.pack(side="left", padx=(0, 8))
+            host.pack(side="left", padx=(0, 8))
+            btn = host._zen_button  # type: ignore[attr-defined]
             self._nav_btns[key] = btn
             btn._zen_fg = fg  # type: ignore[attr-defined]
             btn._zen_hover = hover  # type: ignore[attr-defined]
