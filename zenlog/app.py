@@ -43,11 +43,11 @@ class ZenLogApp(ctk.CTk):
                 pass
 
         self._wallpaper = attach_background(self)
+        self._stack_job = None
 
         self._build_ui()
         self._stack_layers()
         self._show_page("punch")
-        self._refresh()
         self.after(30_000, self._tick)
         self.bind("<Configure>", self._on_resize, add="+")
 
@@ -64,7 +64,20 @@ class ZenLogApp(ctk.CTk):
         except Exception:
             pass
 
-    def _on_resize(self, _event: object | None = None) -> None:
+    def _on_resize(self, event: object | None = None) -> None:
+        # Ignore child layout events; only restack after the window itself moves.
+        widget = getattr(event, "widget", None)
+        if widget is not None and widget is not self:
+            return
+        if self._stack_job is not None:
+            try:
+                self.after_cancel(self._stack_job)
+            except Exception:
+                pass
+        self._stack_job = self.after(50, self._flush_stack)
+
+    def _flush_stack(self) -> None:
+        self._stack_job = None
         self._stack_layers()
 
     def _tick(self) -> None:
@@ -166,10 +179,11 @@ class ZenLogApp(ctk.CTk):
                 )
 
     def _refresh(self) -> None:
-        self.punch_page.refresh()
-        self.forgotten_page.refresh()
-        self.history_page.refresh()
-        self.calendar_page.refresh()
+        # Hidden pages are rebuilt when shown. Refreshing all four on every
+        # punch/tick destroyed and recreated calendar + history widgets.
+        page = self._pages.get(self._current_page)
+        if page is not None:
+            page.refresh()
 
 
 def run() -> None:

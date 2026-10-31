@@ -101,6 +101,38 @@ class PunchData:
         self._sync_past_hours()
         self.save()
 
+    def update_past_hours_seed(
+        self,
+        seed_id: str,
+        hours: float,
+        note: str = "",
+        on_date: str | None = None,
+    ) -> bool:
+        if hours <= 0:
+            raise ValueError("Hours must be a positive number.")
+        for seed in self.data["past_hour_seeds"]:
+            if seed.get("id") != seed_id:
+                continue
+            seed["hours"] = round(float(hours), 4)
+            seed["note"] = (note or "").strip()
+            if on_date:
+                seed["date"] = on_date
+            self._sync_past_hours()
+            self.save()
+            return True
+        return False
+
+    def delete_past_hours_seed(self, seed_id: str) -> bool:
+        before = len(self.data["past_hour_seeds"])
+        self.data["past_hour_seeds"] = [
+            s for s in self.data["past_hour_seeds"] if s.get("id") != seed_id
+        ]
+        if len(self.data["past_hour_seeds"]) == before:
+            return False
+        self._sync_past_hours()
+        self.save()
+        return True
+
     def session_hours_sum(self) -> float:
         return sum(float(s.get("duration_hours", 0)) for s in self.data["sessions"])
 
@@ -215,6 +247,21 @@ class PunchData:
             total += self.hours_on_date(cur)
             cur += timedelta(days=1)
         return total
+
+    def season_start_date(self, on_day: date | None = None) -> date:
+        on_day = on_day or date.today()
+        raw = self.data.get("season_start")
+        if isinstance(raw, str) and raw.strip():
+            return datetime.strptime(raw.strip(), DATE_FMT).date()
+        # Default: fall season from Sep 1 (prior year if before September).
+        if on_day.month >= 9:
+            return date(on_day.year, 9, 1)
+        return date(on_day.year - 1, 9, 1)
+
+    def season_hours(self) -> float:
+        """Punched work hours from season start through today (includes live session)."""
+        start = self.season_start_date()
+        return self.hours_in_range(start, date.today())
 
     def _recalc_session_durations(self) -> None:
         for session in self.data["sessions"]:

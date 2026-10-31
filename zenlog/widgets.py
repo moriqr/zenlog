@@ -27,6 +27,27 @@ from zenlog.theme import (
 )
 
 
+def _cancel_after(widget: Any, job: Any) -> None:
+    if job is None:
+        return
+    try:
+        widget.after_cancel(job)
+    except (tk.TclError, ValueError):
+        pass
+
+
+def _downscale(image: Any, max_edge: int, resample: Any) -> Any:
+    width, height = image.size
+    longest = max(width, height)
+    if longest <= max_edge:
+        return image
+    scale = max_edge / longest
+    return image.resize(
+        (max(1, int(width * scale)), max(1, int(height * scale))),
+        resample,
+    )
+
+
 def attach_background(
     host: ctk.CTk | ctk.CTkFrame,
     *,
@@ -41,35 +62,37 @@ def attach_background(
     except ImportError:
         return None
 
-    paper_src = Image.open(paper_path).convert("RGB")
+    # bg.jpg is a large portrait scan; keep a smaller working copy for resizes.
+    paper_src = _downscale(
+        Image.open(paper_path).convert("RGB"),
+        max_edge=1400,
+        resample=Image.Resampling.BILINEAR,
+    )
     label = ctk.CTkLabel(host, text="", fg_color="transparent")
     label.place(x=0, y=0, relwidth=1, relheight=1)
 
-    state: dict[str, Any] = {"img": None, "w": 0, "h": 0}
+    state: dict[str, Any] = {"img": None, "w": 0, "h": 0, "job": None}
 
     def _stack() -> None:
         # Sit above CTk's solid fill, under packed UI (so dots show around cards)
         try:
             label.lift(host._canvas)  # type: ignore[attr-defined]
         except (tk.TclError, AttributeError):
-            try:
-                label.lift()
-            except tk.TclError:
-                pass
+            pass
 
-    def _paint(_event: object | None = None) -> None:
+    def _paint_now() -> None:
+        state["job"] = None
         w = max(host.winfo_width(), 2)
         h = max(host.winfo_height(), 2)
         if w < 40 or h < 40:
             return
         if w == state["w"] and h == state["h"] and state["img"] is not None:
-            _stack()
             return
         state["w"], state["h"] = w, h
         fitted = ImageOps.fit(
             paper_src,
             (w, h),
-            method=Image.Resampling.LANCZOS,
+            method=Image.Resampling.BILINEAR,
             centering=(0.5, 0.5),
         )
         ctk_img = ctk.CTkImage(light_image=fitted, dark_image=fitted, size=(w, h))
@@ -77,10 +100,13 @@ def attach_background(
         label.configure(image=ctk_img)
         _stack()
 
-    host.bind("<Configure>", _paint)
-    label.bind("<Configure>", _paint)
-    host.after(40, _paint)
-    host.after(50, _stack)
+    def _paint(_event: object | None = None) -> None:
+        # Debounce: a live window drag fires Configure many times per second.
+        _cancel_after(host, state.get("job"))
+        state["job"] = host.after(50, _paint_now)
+
+    host.bind("<Configure>", _paint, add="+")
+    host.after(40, _paint_now)
     return label
 
 
@@ -158,14 +184,27 @@ def lace_frame(
         "h": 0,
         "source": None,
         "paper": None,
+        "job": None,
     }
     try:
-        from PIL import Image
+        from PIL import Image, ImageOps
 
+        # punch-border.png is 1792×2400; the station is ~440×589. Fit once.
+        target = (width, height)
         if path.is_file():
-            state["source"] = Image.open(path).convert("RGBA")
+            src = Image.open(path).convert("RGBA")
+            state["source"] = ImageOps.fit(
+                src, target, method=Image.Resampling.NEAREST, centering=(0.5, 0.5)
+            )
         if BG_PATH.is_file():
-            state["paper"] = Image.open(BG_PATH).convert("RGBA")
+            paper = _downscale(
+                Image.open(BG_PATH).convert("RGBA"),
+                max_edge=1400,
+                resample=Image.Resampling.BILINEAR,
+            )
+            state["paper"] = ImageOps.fit(
+                paper, target, method=Image.Resampling.BILINEAR, centering=(0.5, 0.5)
+            )
     except ImportError:
         state["source"] = None
         state["paper"] = None
@@ -177,7 +216,8 @@ def lace_frame(
         except (tk.TclError, AttributeError):
             pass
 
-    def _paint(_event: object | None = None) -> None:
+    def _paint_now() -> None:
+        state["job"] = None
         w = max(host.winfo_width(), 2)
         h = max(host.winfo_height(), 2)
         if w < 40 or h < 40:
@@ -194,24 +234,29 @@ def lace_frame(
             return
 
         if state["paper"] is not None:
-            paper = ImageOps.fit(
-                state["paper"],
-                (w, h),
-                method=Image.Resampling.LANCZOS,
-                centering=(0.5, 0.5),
-            )
+            if state["paper"].size == (w, h):
+                paper = state["paper"]
+            else:
+                paper = ImageOps.fit(
+                    state["paper"],
+                    (w, h),
+                    method=Image.Resampling.BILINEAR,
+                    centering=(0.5, 0.5),
+                )
         else:
             paper = Image.new("RGBA", (w, h), (r, g, b, 255))
 
         src = state["source"]
         if src is not None:
-            # Fit portrait lace into the portrait host — no square squash
-            lace = ImageOps.fit(
-                src,
-                (w, h),
-                method=Image.Resampling.NEAREST,
-                centering=(0.5, 0.5),
-            )
+            if src.size == (w, h):
+                lace = src
+            else:
+                lace = ImageOps.fit(
+                    src,
+                    (w, h),
+                    method=Image.Resampling.NEAREST,
+                    centering=(0.5, 0.5),
+                )
             composited = Image.alpha_composite(paper, lace).convert("RGB")
         else:
             composited = paper.convert("RGB")
@@ -221,10 +266,12 @@ def lace_frame(
         canvas.create_image(0, 0, anchor="nw", image=photo, tags="lace")
         _stack()
 
+    def _paint(_event: object | None = None) -> None:
+        _cancel_after(host, state.get("job"))
+        state["job"] = host.after(50, _paint_now)
+
     host.bind("<Configure>", _paint, add="+")
-    host.bind("<Configure>", _stack, add="+")
-    host.after(40, _paint)
-    host.after(50, _stack)
+    host.after(40, _paint_now)
     return host, pad
 
 

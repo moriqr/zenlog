@@ -45,6 +45,14 @@ class HistoryPage(ctk.CTkFrame):
         )
         self.punched_label.pack(pady=(10, 0))
 
+        self.season_label = ctk.CTkLabel(
+            totals,
+            text="This season: 0h",
+            font=ctk.CTkFont(family=FONT_BODY, size=12),
+            text_color=COLORS["text_muted"],
+        )
+        self.season_label.pack(pady=(2, 0))
+
         self.total_label = ctk.CTkLabel(
             totals,
             text="All-time (incl. forgotten seeds): 0h",
@@ -60,9 +68,13 @@ class HistoryPage(ctk.CTkFrame):
 
     def refresh(self) -> None:
         punched = self.store.punched_hours()
+        season = self.store.season_hours()
         total = self.store.total_hours()
         self.punched_label.configure(
             text=f"Punched: {format_duration(punched)} ({punched:.2f}h)"
+        )
+        self.season_label.configure(
+            text=f"This season: {format_duration(season)} ({season:.2f}h)"
         )
         self.total_label.configure(
             text=f"All-time (incl. forgotten seeds): {format_duration(total)} ({total:.2f}h)"

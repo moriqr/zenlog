@@ -1,10 +1,10 @@
 {
-  "past_hours": 81.0,
+  "past_hours": 31.0,
   "past_hour_seeds": [
     {
       "id": "689c54ea-f3f9-40e6-9295-5d276e4885ee",
       "date": "2026-10-21",
-      "hours": 80.0,
+      "hours": 30.0,
       "note": "Migrated from previous past-hours seed",
       "created_at": "2026-10-21T15:23:52"
     },
@@ -18,8 +18,8 @@
   ],
   "status": "clocked_in",
   "current_session": {
-    "date": "2026-10-29",
-    "clock_in": "2026-10-29T16:06:31"
+    "date": "2026-10-30",
+    "clock_in": "2026-10-30T18:33:19"
   },
   "current_break": null,
   "sessions": [
@@ -112,6 +112,20 @@
       "clock_in": "2026-10-28T21:27:11",
       "clock_out": "2026-10-29T06:25:08",
       "duration_hours": 6.5019,
+      "type": "work"
+    },
+    {
+      "date": "2026-10-29",
+      "clock_in": "2026-10-29T16:06:31",
+      "clock_out": "2026-10-30T01:39:43",
+      "duration_hours": 7.3705,
+      "type": "work"
+    },
+    {
+      "date": "2026-10-30",
+      "clock_in": "2026-10-30T02:58:00",
+      "clock_out": "2026-10-30T08:29:00",
+      "duration_hours": 5.5167,
       "type": "work"
     }
   ],
