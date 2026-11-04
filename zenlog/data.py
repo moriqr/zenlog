@@ -308,6 +308,37 @@ class PunchData:
             return True
         return False
 
+    def update_current_session(self, clock_in: datetime) -> bool:
+        """Adjust the live work punch's clock-in time (no clock-out yet)."""
+        if self.status == "clocked_out" or not self.data.get("current_session"):
+            return False
+        t = now()
+        if clock_in >= t:
+            raise ValueError("Clock in must be before now.")
+
+        current = self.data.get("current_break")
+        if current and self.status == "on_break":
+            br_start = parse_iso(current["break_start"])
+            if clock_in >= br_start:
+                raise ValueError("Clock in must be before the current break started.")
+
+        old_in = parse_iso(self.data["current_session"]["clock_in"])
+        earliest_break: datetime | None = None
+        for b in self.data["breaks"]:
+            b_start = parse_iso(b["break_start"])
+            if b_start >= old_in and b_start <= t:
+                if earliest_break is None or b_start < earliest_break:
+                    earliest_break = b_start
+        if earliest_break is not None and clock_in > earliest_break:
+            raise ValueError("Clock in must be before breaks already logged in this session.")
+
+        self.data["current_session"] = {
+            "date": clock_in.strftime(DATE_FMT),
+            "clock_in": clock_in.strftime(ISO_FMT),
+        }
+        self.save()
+        return True
+
     def update_break(self, old_break_start: str, break_start: datetime, break_end: datetime) -> bool:
         if break_end <= break_start:
             raise ValueError("Break end must be after break start.")
