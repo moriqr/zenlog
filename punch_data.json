@@ -19,7 +19,7 @@
   "status": "clocked_in",
   "current_session": {
     "date": "2026-11-04",
-    "clock_in": "2026-11-04T10:30:00"
+    "clock_in": "2026-11-04T22:11:13"
   },
   "current_break": null,
   "sessions": [
@@ -169,6 +169,13 @@
       "clock_out": "2026-11-04T08:47:00",
       "duration_hours": 4.7833,
       "type": "work"
+    },
+    {
+      "date": "2026-11-04",
+      "clock_in": "2026-11-04T10:30:00",
+      "clock_out": "2026-11-04T13:25:17",
+      "duration_hours": 2.9214,
+      "type": "work"
     }
   ],
   "breaks": [
@@ -261,6 +268,20 @@
       "break_start": "2026-11-02T10:11:56",
       "break_end": "2026-11-02T11:20:22",
       "duration_hours": 1.1406,
+      "type": "break"
+    },
+    {
+      "date": "2026-11-05",
+      "break_start": "2026-11-05T00:55:41",
+      "break_end": "2026-11-05T02:18:13",
+      "duration_hours": 1.3756,
+      "type": "break"
+    },
+    {
+      "date": "2026-11-05",
+      "break_start": "2026-11-05T02:50:00",
+      "break_end": "2026-11-05T06:30:00",
+      "duration_hours": 3.6667,
       "type": "break"
     }
   ]

@@ -10,7 +10,7 @@ from tkinter import messagebox
 
 from zenlog.data import PunchData
 from zenlog.theme import BORDER_WIDTH, COLORS, FONT_BODY, FONT_DISPLAY
-from zenlog.timeutil import DATE_FMT, format_duration, format_time, parse_iso
+from zenlog.timeutil import DATE_FMT, format_duration, format_time, parse_iso, parse_time
 from zenlog.widgets import cute_panel, cute_window, page_title, pill_button
 
 
@@ -115,8 +115,8 @@ class HistoryPage(ctk.CTkFrame):
             end_dt = parse_iso(row["end"])
             cells = [
                 (row["date"], 100),
-                (format_time(start_dt), 100),
-                (format_time(end_dt), 100),
+                (format_time(start_dt), 120),
+                (format_time(end_dt), 120),
                 (format_duration(row["duration_hours"]), 80),
             ]
             for text, width in cells:
@@ -180,7 +180,7 @@ class HistoryPage(ctk.CTkFrame):
         ).pack(anchor="w")
         ctk.CTkLabel(
             body,
-            text="Use date YYYY-MM-DD and time HH:MM (24-hour).",
+            text="Use date YYYY-MM-DD and time like 9:05 am.",
             font=ctk.CTkFont(family=FONT_BODY, size=12),
             text_color=COLORS["text_muted"],
         ).pack(anchor="w", pady=(2, 12))
@@ -191,8 +191,8 @@ class HistoryPage(ctk.CTkFrame):
         fields: dict[str, ctk.CTkEntry] = {}
         specs = [
             ("date", "Date", start_dt.strftime(DATE_FMT)),
-            ("start", "Start (HH:MM)", start_dt.strftime("%H:%M")),
-            ("end", "End (HH:MM)", end_dt.strftime("%H:%M")),
+            ("start", "Start", format_time(start_dt)),
+            ("end", "End", format_time(end_dt)),
         ]
         for key_name, title, value in specs:
             row_f = ctk.CTkFrame(form, fg_color="transparent")
@@ -239,10 +239,10 @@ class HistoryPage(ctk.CTkFrame):
                 hint.configure(text="Date must be YYYY-MM-DD.")
                 return None
             try:
-                start_t = datetime.strptime(start_raw, "%H:%M").time()
-                end_t = datetime.strptime(end_raw, "%H:%M").time()
+                start_t = parse_time(start_raw)
+                end_t = parse_time(end_raw)
             except ValueError:
-                hint.configure(text="Times must be HH:MM (24-hour).")
+                hint.configure(text="Times must look like 9:05 am.")
                 return None
             start = datetime.combine(day, start_t)
             end = datetime.combine(day, end_t)

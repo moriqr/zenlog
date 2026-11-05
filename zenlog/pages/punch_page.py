@@ -16,7 +16,7 @@ from zenlog.theme import (
     FONT_DISPLAY,
     PUNCH_BORDER_ASPECT,
 )
-from zenlog.timeutil import DATE_FMT, format_duration, format_time, parse_iso
+from zenlog.timeutil import DATE_FMT, format_duration, format_time, parse_iso, parse_time
 from zenlog.widgets import (
     cute_panel,
     lace_frame,
@@ -224,7 +224,7 @@ class PunchPage(ctk.CTkFrame):
         ).pack(anchor="w")
         ctk.CTkLabel(
             body,
-            text="Use date YYYY-MM-DD and time HH:MM (24-hour).",
+            text="Use date YYYY-MM-DD and time like 9:05 am.",
             font=ctk.CTkFont(family=FONT_BODY, size=12),
             text_color=COLORS["text_muted"],
         ).pack(anchor="w", pady=(2, 12))
@@ -235,7 +235,7 @@ class PunchPage(ctk.CTkFrame):
         fields: dict[str, ctk.CTkEntry] = {}
         specs = [
             ("date", "Date", start_dt.strftime(DATE_FMT)),
-            ("start", "Start (HH:MM)", start_dt.strftime("%H:%M")),
+            ("start", "Start", format_time(start_dt)),
         ]
         for key_name, title, value in specs:
             row_f = ctk.CTkFrame(form, fg_color="transparent")
@@ -281,9 +281,9 @@ class PunchPage(ctk.CTkFrame):
                 hint.configure(text="Date must be YYYY-MM-DD.")
                 return None
             try:
-                start_t = datetime.strptime(start_raw, "%H:%M").time()
+                start_t = parse_time(start_raw)
             except ValueError:
-                hint.configure(text="Time must be HH:MM (24-hour).")
+                hint.configure(text="Time must look like 9:05 am.")
                 return None
             return datetime.combine(day, start_t)
 
