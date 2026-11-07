@@ -136,7 +136,7 @@ class HistoryPage(ctk.CTkFrame):
                 pill_button(
                     actions,
                     "edit",
-                    width=64,
+                    width=42,
                     height=26,
                     font_size=11,
                     command=lambda r=row: self._on_edit_punch(r),
@@ -145,7 +145,7 @@ class HistoryPage(ctk.CTkFrame):
                 pill_button(
                     actions,
                     "delete",
-                    width=64,
+                    width=52,
                     height=26,
                     font_size=11,
                     command=lambda r=row: self._on_delete_punch(r),
